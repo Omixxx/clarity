@@ -1,7 +1,8 @@
 import argparse
 import logging
-from git import Repo
 import os
+
+from git import Repo
 
 
 def main():
