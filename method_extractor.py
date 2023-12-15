@@ -1,8 +1,44 @@
 import argparse
 import logging
-import re
 
-METHOD_PATTERN_REGEX = r"\b(?:public|private|protected|static|final|\s)+([\w<>]+)\s+(\w+)\s*\([^)]*\)\s*{([^}]*)}"
+import javalang
+
+
+def __get_start_end_for_node(node_to_find, tree):
+    start = None
+    end = None
+    for path, node in tree:
+        if start is not None and node_to_find not in path:
+            end = node.position
+            return start, end
+        if start is None and node == node_to_find:
+            start = node.position
+    return start, end
+
+
+def __get_string(start, end, data):
+    if start is None:
+        return ""
+
+    # positions are all offset by 1. e.g. first line -> lines[0], start.line = 1
+    end_pos = None
+
+    if end is not None:
+        end_pos = end.line - 1
+
+    lines = data.splitlines(True)
+    string = "".join(lines[start.line : end_pos])
+    string = lines[start.line - 1] + string
+
+    # When the method is the last one, it will contain a additional brace
+    if end is None:
+        left = string.count("{")
+        right = string.count("}")
+        if right - left == 1:
+            p = string.rfind("}")
+            string = string[:p]
+
+    return string
 
 
 def main():
@@ -19,10 +55,12 @@ def main():
     file_path = args.java_file.pop()
     with open(file_path, "r") as file:
         file_text = file.read()
-        found_methods = re.finditer(METHOD_PATTERN_REGEX, file_text, re.DOTALL)
-        methods_list = [match.group(0) for match in found_methods]
-        for method in methods_list:
-            print(method)
+        tree = javalang.parse.parse(file_text)
+        methods = list()
+        for _, node in tree.filter(javalang.parser.tree.MethodDeclaration):
+            start, end = __get_start_end_for_node(node, tree)
+            methods.append(__get_string(start, end, file_text))
+        print(methods)
 
 
 if __name__ == "__main__":
