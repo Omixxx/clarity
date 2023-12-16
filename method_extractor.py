@@ -3,6 +3,9 @@ import logging
 
 import javalang
 
+METHOD_NAME_KEY = "method_name"
+METHOD_BODY_KEY = "body"
+
 
 def __get_start_end_for_node(node_to_find, tree):
     start = None
@@ -41,7 +44,7 @@ def __get_string(start, end, data):
     return string
 
 
-def extract_methods(file_path: str) -> list[dict]:
+def extract_methods(file_path: str) -> list[dict[str, str]]:
     logging.getLogger().setLevel(logging.INFO)
     with open(file_path, "r") as file:
         file_text = file.read()
@@ -51,8 +54,8 @@ def extract_methods(file_path: str) -> list[dict]:
             start, end = __get_start_end_for_node(node, tree)
             methods.append(
                 {
-                    "method_name": node.name,
-                    "body": __get_string(start, end, file_text),
+                    METHOD_NAME_KEY: node.name,
+                    METHOD_BODY_KEY: __get_string(start, end, file_text),
                 }
             )
         return methods
