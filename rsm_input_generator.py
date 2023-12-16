@@ -23,14 +23,8 @@ def main():
     for file_path in args.files:
         logging.info("Processing file: %s", file_path)
         methods = me.extract_methods(file_path)
-        if not os.path.isdir(TEMP_FILES_PREFIX):
-            os.mkdir(TEMP_FILES_PREFIX)
-
-        os.chdir(TEMP_FILES_PREFIX)
         for method in methods:
-            print(method)
-
-        
+            print(method, "\n")
 
 
 if __name__ == "__main__":

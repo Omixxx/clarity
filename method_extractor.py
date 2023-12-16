@@ -41,7 +41,7 @@ def __get_string(start, end, data):
     return string
 
 
-def extract_methods(file_path: str) -> list[tuple[str, str]]:
+def extract_methods(file_path: str) -> list[dict]:
     logging.getLogger().setLevel(logging.INFO)
     with open(file_path, "r") as file:
         file_text = file.read()
@@ -49,7 +49,12 @@ def extract_methods(file_path: str) -> list[tuple[str, str]]:
         methods = list()
         for _, node in tree.filter(javalang.parser.tree.MethodDeclaration):
             start, end = __get_start_end_for_node(node, tree)
-            methods.append((node.name, __get_string(start, end, file_text)))
+            methods.append(
+                {
+                    "method_name": node.name,
+                    "body": __get_string(start, end, file_text),
+                }
+            )
         return methods
 
 
