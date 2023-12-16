@@ -41,8 +41,19 @@ def __get_string(start, end, data):
     return string
 
 
-def main():
+def extract_methods(file_path: str) -> list[str]:
     logging.getLogger().setLevel(logging.INFO)
+    with open(file_path, "r") as file:
+        file_text = file.read()
+        tree = javalang.parse.parse(file_text)
+        methods = list()
+        for _, node in tree.filter(javalang.parser.tree.MethodDeclaration):
+            start, end = __get_start_end_for_node(node, tree)
+            methods.append(__get_string(start, end, file_text))
+        return methods
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download GitHub repositories")
     parser.add_argument(
         "java_file",
@@ -53,15 +64,4 @@ def main():
     )
     args = parser.parse_args()
     file_path = args.java_file.pop()
-    with open(file_path, "r") as file:
-        file_text = file.read()
-        tree = javalang.parse.parse(file_text)
-        methods = list()
-        for _, node in tree.filter(javalang.parser.tree.MethodDeclaration):
-            start, end = __get_start_end_for_node(node, tree)
-            methods.append(__get_string(start, end, file_text))
-        print(methods)
-
-
-if __name__ == "__main__":
-    main()
+    extract_methods(file_path)
