@@ -1,9 +1,9 @@
-from os import mkdir
+import os
 import method_extractor as me
 import logging
 import argparse
 
-TEMP_FILE_PREFIX = "temp"
+TEMP_FILES_PREFIX = "temp"
 
 
 def main():
@@ -23,6 +23,14 @@ def main():
     for file_path in args.files:
         logging.info("Processing file: %s", file_path)
         methods = me.extract_methods(file_path)
+        if not os.path.isdir(TEMP_FILES_PREFIX):
+            os.mkdir(TEMP_FILES_PREFIX)
+
+        os.chdir(TEMP_FILES_PREFIX)
+        for method in methods:
+            print(method)
+
+        
 
 
 if __name__ == "__main__":
