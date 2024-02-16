@@ -22,10 +22,11 @@ public class MethodExtractor {
 
     CompilationUnit cu = StaticJavaParser.parse(Files.newInputStream(Paths.get(file.getPath())));
     for (MethodDeclaration method : cu.findAll(MethodDeclaration.class)) {
-      MethodInfo me = new MethodInfo(method.getNameAsString(), method.getBody().isPresent() ? method.getBody().get().toString() : "",
-          method.getRange().get().begin.line,
-          method.getRange().get().end.line, file);
-      this.methods.add(me);
+      this.methods.add(new MethodInfo(
+          method.getNameAsString(),
+          method.getBody().isPresent() ? method.getBody().get().toString() : "",
+          method.getRange().get().begin.line, method.getRange().get().end.line,
+          file));
     }
     return this.methods;
   }
