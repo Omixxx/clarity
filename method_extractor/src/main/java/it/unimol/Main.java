@@ -1,7 +1,11 @@
 package it.unimol;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +18,8 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     for (String filePath : args) {
-      LOGGER.info("Processing file: " + filePath);
       File file = new File(filePath);
+      LOGGER.info("Processing file: " + file.getPath());
 
       if (file.isDirectory()) {
         List<File> subFiles = Arrays.asList(file.listFiles());
@@ -26,44 +30,48 @@ public class Main {
       Optional<String> extension = getFileExtension(file.getPath());
       if (!extension.isPresent() || extension.isEmpty() ||
           !extension.get().equals("java")) {
-        return;
+        continue;
       }
 
-      List<MethodInfo> methodInfos = methodExtractor.extract(file);
+      List<MethodInfo> methodsInfo = methodExtractor.extract(file);
+
+      String os = System.getProperty("os.name");
+      String prefix = os.trim().contains("Windows") ? "temp\\" : "temp";
+      String tempFilePath = prefix + removeExtension(file.getPath());
+      System.out.println(tempFilePath);
+      String projectRootDir = System.getProperty("user.dir");
+      System.out.println(projectRootDir);
+
+      // File tempDir = new File(tempFilePath);
+      // if (!tempDir.exists()) {
+      // tempDir.mkdirs();
+      // }
+      //
+      // System.setProperty("user.dir", tempFilePath);
+      //
+      // for (MethodInfo methodInfo : methodsInfo) {
+      // try (FileWriter writer = new FileWriter(methodInfo.getName() +
+      // ".java")) {
+      // writer.write(methodInfo.getBody());
+      // } catch (IOException e) {
+      // e.printStackTrace();
+      // }
+      // }
+      // System.setProperty("user.dir", projectRootDir);
     }
-
-    // TODO: creazione dei file temporanei
-
-    // List<MethodInfo> methods = methodExtractor.extract(filePath);
-
-    // String tempFilePath = prefix + filePath.split("\\.")[0];
-    // String fileType = filePath.split("\\.")[1];
-    // String rootDir = System.getProperty("user.dir");
-    //
-    // File tempDir = new File(tempFilePath);
-    // if (!tempDir.exists()) {
-    // tempDir.mkdirs();
-    // }
-    //
-    // System.setProperty("user.dir", tempFilePath);
-    //
-    // for (MethodInfo method : methods) {
-    // try (FileWriter writer = new FileWriter(method.getName() + "." +
-    // fileType)) {
-    // writer.write(method.getBody());
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    //
-    // System.setProperty("user.dir", rootDir);
   }
 
+  private static void serialize(MethodInfo info) {
+  }
 
   private static Optional<String> getFileExtension(String filename) {
     return Optional.ofNullable(filename)
         .filter(f -> f.contains("."))
         .map(f -> f.substring(filename.lastIndexOf(".") + 1));
+  }
+
+  private static String removeExtension(String filename) {
+    return filename.replaceFirst("[.][^.]+$", "");
   }
 
   private static String[] getSubFilesPaths(List<File> files) {
