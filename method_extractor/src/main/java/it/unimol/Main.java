@@ -28,7 +28,7 @@ public class Main {
           extension.get().equals("java")) {
         List<MethodInfo> infos = methodExtractor.extract(file);
         infos.forEach(info -> {
-          System.out.println("name" + info.getName());
+          System.out.println(info.getBody());
         });
       }
     }
