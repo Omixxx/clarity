@@ -9,12 +9,12 @@ import java.util.logging.Logger;
 
 public class Main {
 
-  private static final Logger LOGGER = Logger.getLogger(Process.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
   private static final MethodExtractor methodExtractor = new MethodExtractor();
 
   public static void main(String[] args) throws IOException {
     for (String filePath : args) {
-      // LOGGER.info("Processing file: " + filePath);
+      LOGGER.info("Processing file: " + filePath);
       File file = new File(filePath);
 
       if (file.isDirectory()) {
@@ -23,7 +23,7 @@ public class Main {
         main(subFilesPath);
       }
 
-      Optional<String> extension = getFileExtension(filePath);
+      Optional<String> extension = getFileExtension(file.getPath());
       if (extension.isPresent() && !extension.isEmpty() &&
           extension.get().equals("java")) {
         List<MethodInfo> infos = methodExtractor.extract(file);
