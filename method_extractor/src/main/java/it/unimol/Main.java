@@ -24,13 +24,12 @@ public class Main {
       }
 
       Optional<String> extension = getFileExtension(file.getPath());
-      if (extension.isPresent() && !extension.isEmpty() &&
-          extension.get().equals("java")) {
-        List<MethodInfo> infos = methodExtractor.extract(file);
-        infos.forEach(info -> {
-          System.out.println(info.getBody());
-        });
+      if (!extension.isPresent() || extension.isEmpty() ||
+          !extension.get().equals("java")) {
+        return;
       }
+
+      List<MethodInfo> methodInfos = methodExtractor.extract(file);
     }
 
     // TODO: creazione dei file temporanei
@@ -59,6 +58,7 @@ public class Main {
     //
     // System.setProperty("user.dir", rootDir);
   }
+
 
   private static Optional<String> getFileExtension(String filename) {
     return Optional.ofNullable(filename)
