@@ -16,7 +16,7 @@ public class Main {
   private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
   private static final MethodExtractor methodExtractor = new MethodExtractor();
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
     for (String filePath : args) {
       File file = new File(filePath);
       LOGGER.info("Processing file: " + file.getPath());
@@ -42,22 +42,21 @@ public class Main {
       String projectRootDir = System.getProperty("user.dir");
       System.out.println(projectRootDir);
 
-      // File tempDir = new File(tempFilePath);
-      // if (!tempDir.exists()) {
-      // tempDir.mkdirs();
-      // }
-      //
-      // System.setProperty("user.dir", tempFilePath);
-      //
-      // for (MethodInfo methodInfo : methodsInfo) {
-      // try (FileWriter writer = new FileWriter(methodInfo.getName() +
-      // ".java")) {
-      // writer.write(methodInfo.getBody());
-      // } catch (IOException e) {
-      // e.printStackTrace();
-      // }
-      // }
-      // System.setProperty("user.dir", projectRootDir);
+      File tempDir = new File(tempFilePath);
+      if (!tempDir.exists()) {
+        tempDir.mkdirs();
+      }
+
+      System.setProperty("user.dir", tempFilePath);
+
+      for (MethodInfo methodInfo : methodsInfo) {
+        try (FileWriter writer = new FileWriter(methodInfo.getName() + ".java")) {
+          writer.write(methodInfo.getBody());
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      System.setProperty("user.dir", projectRootDir);
     }
   }
 
