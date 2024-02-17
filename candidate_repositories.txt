@@ -1,5 +1,0 @@
-https://github.com/00-evan/shattered-pixel-dungeon,
-https://github.com/airbnb/lottie-android,
-https://github.com/google/guava,
-https://github.com/google/guice,
-https://github.com/jenkinsci/jenkins
