@@ -1,4 +1,0 @@
-class Snippet {
-   void beforeCreate()
-
-}
