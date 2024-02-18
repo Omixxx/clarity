@@ -30,7 +30,8 @@ public class MethodExtractor {
             method.getBody().isPresent() ? method.getBody().get().toString()
                 : "",
             method.getRange().get().begin.line,
-            method.getRange().get().end.line, file));
+            method.getRange().get().end.line, file,
+            method.getDeclarationAsString(true, true)));
       }
     } catch (IOException e) {
       e.printStackTrace();

@@ -1,5 +1,6 @@
 .idea/
 clarity/target/**
+clarity/lib/**
 *.class
 *.jar
 *.txt

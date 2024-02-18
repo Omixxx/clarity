@@ -51,7 +51,8 @@ public class Main {
 
       for (MethodInfo methodInfo : methodsInfo) {
         try (FileWriter writer = new FileWriter(methodInfo.getName() + ".java")) {
-          writer.write(methodInfo.getBody());
+          writer.write(
+              wrapAsSnippet(methodInfo.getBody(), methodInfo.getDeclaration()));
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -75,5 +76,10 @@ public class Main {
 
   private static String[] getSubFilesPaths(List<File> files) {
     return files.stream().map(file -> file.getPath()).toArray(String[]::new);
+  }
+
+  private static String wrapAsSnippet(String body, String declaration) {
+    String method = declaration + body;
+    return "class Snippet {\n\t" + method + "\n}";
   }
 }

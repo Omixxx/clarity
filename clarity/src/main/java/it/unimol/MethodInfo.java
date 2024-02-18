@@ -5,6 +5,7 @@ import java.io.File;
 final class MethodInfo {
 
   private String name;
+  private String declaration;
   private String body;
   private Integer startLine;
   private Integer endLine;
@@ -14,8 +15,9 @@ final class MethodInfo {
   }
 
   public MethodInfo(String name, String body, Integer startLine,
-      Integer endLine, File originFile) {
+      Integer endLine, File originFile, String declaration) {
     this.name = name;
+    this.declaration = declaration;
     this.body = body;
     this.startLine = startLine;
     this.endLine = endLine;
@@ -40,5 +42,9 @@ final class MethodInfo {
 
   public String getName() {
     return this.name;
+  }
+
+  public String getDeclaration() {
+    return this.declaration;
   }
 }
