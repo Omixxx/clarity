@@ -1,12 +1,11 @@
+/* (C)2024 */
 package it.unimol;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -79,7 +78,12 @@ public class Main {
   }
 
   private static String wrapAsSnippet(String body, String declaration) {
-    String method = declaration + body;
-    return "class Snippet {\n\t" + method + "\n}";
+    String nonFormattedMethod = declaration + body;
+    String spaces = nonFormattedMethod.split("\n")[0].replaceAll("[^ ]", "");
+    StringBuilder method = new StringBuilder("");
+    for (String str : nonFormattedMethod.split("\n")) {
+      method.append(spaces + str + "\n");
+    }
+    return "class Snippet {\n" + method + "\n}";
   }
 }

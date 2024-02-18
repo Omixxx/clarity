@@ -1,3 +1,4 @@
+/* (C)2024 */
 package it.unimol;
 
 import com.github.javaparser.StaticJavaParser;
