@@ -35,7 +35,7 @@ def clone_repos(repo_urls: list[str]):
     for url in repo_urls:
         repo_name = url.split("/")[-1].strip()
         if not os.path.exists(repo_name):
-            logging.info(f"Cloning {repo_name} ...")
+            logging.info(f"Cloning {repo_name}...")
             Repo.clone_from(url.strip(), "./" + repo_name)
             logging.info(f"Cloned {repo_name} successfully")
         else:

@@ -3,6 +3,9 @@ clarity/target/**
 *.class
 *.jar
 *.txt
+clarity/.classpath
+clarity/.settings/*
+clarity/.project
 
 repos/*
 scripts/.venv/
