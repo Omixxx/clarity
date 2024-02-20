@@ -1,0 +1,13 @@
+.idea/
+clarity/target/**
+clarity/lib/**
+*.class
+*.jar
+*.txt
+clarity/.classpath
+clarity/.settings/*
+clarity/.project
+clarity/temp/**
+
+repos/*
+scripts/.venv/
