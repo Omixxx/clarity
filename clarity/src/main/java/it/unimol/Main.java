@@ -40,18 +40,17 @@ public class Main {
           LOGGER.severe("Error extracting methods from file: " + f.getPath() +
               ": " + e.getMessage());
         }
-
         LOGGER.info("Methods extracted successfully");
+
         for (MethodInfo methodInfo : methodsInfo) {
           LOGGER.info("Storing method body and declaration in a temp file: " +
               methodInfo.getName());
-          File tempFile = new File(
-              TEMP_FILE_PATH +
-                  Utils.removeExtension(
-                      methodInfo.getRelativePathOfOriginalFile().substring(
-                          rootIndex))
-                  +
-                  TRAIL_CHARACHTER,
+          File tempFile = new File(TEMP_FILE_PATH +
+              methodInfo.getRelativePathOfOriginalFile()
+                  .substring(rootIndex)
+                  .replace(".java", "")
+              +
+              TRAIL_CHARACHTER,
               methodInfo.getName() + ".java");
 
           try {
@@ -69,7 +68,8 @@ public class Main {
                 new File(tempFile.getAbsolutePath().replace(".java", ".json")),
                 json);
           } catch (JsonIOException | IOException e) {
-            e.printStackTrace();
+            LOGGER.severe("Error during serialization of method info: " +
+                methodInfo.getName() + ": " + e.getMessage());
           }
         }
       }
