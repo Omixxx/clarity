@@ -15,12 +15,7 @@ import java.util.List;
 public class MethodExtractor {
   private List<MethodInfo> methods = new ArrayList<>();
 
-  public List<MethodInfo> extract(File file) {
-
-    if (file.isDirectory() || !file.exists()) {
-      System.out.println("File not found");
-      System.exit(1);
-    }
+  public List<MethodInfo> extract(File file) throws IOException {
 
     try (InputStream s = Files.newInputStream(Paths.get(file.getPath()))) {
 
@@ -35,7 +30,7 @@ public class MethodExtractor {
             method.getDeclarationAsString(true, true)));
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new IOException("Error while reading the file");
     }
     return this.methods;
   }

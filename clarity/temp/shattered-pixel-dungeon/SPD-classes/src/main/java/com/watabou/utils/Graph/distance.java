@@ -1,0 +1,3 @@
+class Snippet {
+   int distance()
+}
