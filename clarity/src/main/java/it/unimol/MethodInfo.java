@@ -1,55 +1,56 @@
 /* (C)2024 */
 package it.unimol;
 
-import java.io.File;
-
 final class MethodInfo {
 
-    private String name;
-    private String declaration;
-    private String body;
-    private Integer startLine;
-    private Integer endLine;
-    private File originFile;
+  private String name;
+  private String declaration;
+  private String body;
+  private Integer startLine;
+  private Integer endLine;
+  private String originFileAbsolutePath;
+  private String originFileRelativePath;
 
-    public MethodInfo() {}
+  public MethodInfo() {
+  }
 
-    public MethodInfo(
-            String name,
-            String body,
-            Integer startLine,
-            Integer endLine,
-            File originFile,
-            String declaration) {
-        this.name = name;
-        this.declaration = declaration;
-        this.body = body;
-        this.startLine = startLine;
-        this.endLine = endLine;
-        this.originFile = originFile;
-    }
+  public MethodInfo(String name, String body, Integer startLine,
+      Integer endLine, String orginFileAbsolutePath,
+      String relativePath, String declaration) {
+    this.name = name;
+    this.declaration = declaration;
+    this.body = body;
+    this.startLine = startLine;
+    this.endLine = endLine;
+    this.originFileAbsolutePath = orginFileAbsolutePath;
+    this.originFileRelativePath = relativePath;
+  }
 
-    public File getOriginFile() {
-        return this.originFile;
-    }
+  public String getAbsolutePathOfOriginalFile() {
+    return this.originFileAbsolutePath;
+  }
 
-    public String getBody() {
-        return body;
-    }
+  public String getRelativePathOfOriginalFile() {
+    return this.originFileRelativePath;
+  }
 
-    public Integer getStartLine() {
-        return startLine;
-    }
+  public String getBody() {
+    return body;
+  }
 
-    public Integer getEndLine() {
-        return endLine;
-    }
+  public Integer getStartLine() {
+    return startLine;
+  }
 
-    public String getName() {
-        return this.name;
-    }
+  public Integer getEndLine() {
+    return endLine;
+  }
 
-    public String getDeclaration() {
-        return this.declaration;
-    }
+  public String getName() {
+    return this.name;
+  }
+
+  public String getDeclaration() {
+    return this.declaration;
+  }
 }

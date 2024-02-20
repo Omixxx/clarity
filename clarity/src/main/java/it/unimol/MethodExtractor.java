@@ -26,8 +26,9 @@ public class MethodExtractor {
             method.getBody().isPresent() ? method.getBody().get().toString()
                 : "",
             method.getRange().get().begin.line,
-            method.getRange().get().end.line, file,
-            method.getDeclarationAsString(true, true)));
+            method.getRange().get().end.line,
+            Paths.get(file.getPath()).toAbsolutePath().normalize().toString(),
+            file.getPath(), method.getDeclarationAsString(true, true)));
       }
     } catch (IOException e) {
       throw new IOException("Error while reading the file");

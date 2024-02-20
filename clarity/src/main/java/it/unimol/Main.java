@@ -1,7 +1,12 @@
 /* (C)2024 */
 package it.unimol;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +18,7 @@ public class Main {
   private static final String TEMP_FILE_PATH = "temp" + TRAIL_CHARACHTER;
   private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
   private static final MethodExtractor methodExtractor = new MethodExtractor();
+  private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   public static void main(String[] args) {
     for (String filePath : args) {
@@ -35,22 +41,35 @@ public class Main {
               ": " + e.getMessage());
         }
 
+        LOGGER.info("Methods extracted successfully");
         for (MethodInfo methodInfo : methodsInfo) {
-          LOGGER.info("Creating temp file for method: " + methodInfo.getName());
-          File tempFile = new File(TEMP_FILE_PATH +
-              Utils.removeExtension(
-                  methodInfo.getOriginFile().getPath().substring(
-                      rootIndex))
-              +
-              TRAIL_CHARACHTER,
+          LOGGER.info("Storing method body and declaration in a temp file: " +
+              methodInfo.getName());
+          File tempFile = new File(
+              TEMP_FILE_PATH +
+                  Utils.removeExtension(
+                      methodInfo.getRelativePathOfOriginalFile().substring(
+                          rootIndex))
+                  +
+                  TRAIL_CHARACHTER,
               methodInfo.getName() + ".java");
 
           try {
             Utils.createFile(tempFile,
                 methodExtractor.wrapAsSnippet(methodInfo));
           } catch (IOException e) {
-            LOGGER.severe("Error creating temp file for method: " +
+            LOGGER.severe("Error during file creation: " +
                 tempFile.getAbsolutePath() + ": " + e.getMessage());
+          }
+
+          LOGGER.info("Serializing methods additional informaton...");
+          try {
+            String json = gson.toJson(methodInfo);
+            Utils.createFile(
+                new File(tempFile.getAbsolutePath().replace(".java", ".json")),
+                json);
+          } catch (JsonIOException | IOException e) {
+            e.printStackTrace();
           }
         }
       }
