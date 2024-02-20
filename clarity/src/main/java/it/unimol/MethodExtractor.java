@@ -34,4 +34,16 @@ public class MethodExtractor {
     }
     return this.methods;
   }
+
+  public String wrapAsSnippet(MethodInfo methodInfo) {
+    String nonFormattedMethod = methodInfo.getDeclaration() + methodInfo.getBody();
+    assert (!nonFormattedMethod.isEmpty() && nonFormattedMethod.contains("\n"));
+
+    String spaces = nonFormattedMethod.split("\n")[0].replaceAll("[^ ]", "");
+    StringBuilder method = new StringBuilder("");
+    for (String str : nonFormattedMethod.split("\n")) {
+      method.append(spaces + str + "\n");
+    }
+    return "class Snippet {\n" + method + "}";
+  }
 }
