@@ -8,17 +8,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class Main {
 
-  private static final String TRAIL_CHARACHTER = System.getProperty("os.name") == "Windows" ? "\\" : "/";
-  private static final String TEMP_FILE_PATH = "temp" + TRAIL_CHARACHTER;
+  private static final String TEMP_FILE_PATH = "temp" + Utils.TRAIL_CHARACHTER;
   private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
   private static final MethodExtractor methodExtractor = new MethodExtractor();
   private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  private static final Rsm rsm = new Rsm();
 
   public static void main(String[] args) {
     for (String filePath : args) {
@@ -28,8 +29,8 @@ public class Main {
       String projectName = file.getName();
       List<File> javaFiles = Utils.getAllJavaFiles(file);
 
+      int rootIndex = filePath.indexOf(projectName);
       for (File f : javaFiles) {
-        int rootIndex = f.getPath().indexOf(projectName);
 
         List<MethodInfo> methodsInfo = new ArrayList<>();
 
@@ -50,7 +51,7 @@ public class Main {
                   .substring(rootIndex)
                   .replace(".java", "")
               +
-              TRAIL_CHARACHTER,
+              Utils.TRAIL_CHARACHTER,
               methodInfo.getName() + ".java");
 
           try {
@@ -71,6 +72,9 @@ public class Main {
             LOGGER.severe("Error during serialization of method info: " +
                 methodInfo.getName() + ": " + e.getMessage());
           }
+
+          double score = rsm.analyze(Path.of(tempFile.getPath()));
+          LOGGER.info("Score: " + score);
         }
       }
     }
