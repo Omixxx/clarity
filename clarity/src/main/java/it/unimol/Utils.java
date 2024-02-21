@@ -13,6 +13,7 @@ import java.util.Optional;
  * Utils
  */
 public class Utils {
+ public static String TRAIL_CHARACHTER = System.getProperty("os.name") == "Windows" ? "\\" : "/"; 
 
   public static List<File> getAllJavaFiles(File root) {
     List<File> java_files = new ArrayList<>();
