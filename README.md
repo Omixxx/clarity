@@ -1,25 +1,33 @@
-## 
+## Configuration 🪧
 
-## Configuration
+### Repository downloader (optional) ⤵️
 
 #### 1. Setting up virtual enviroment
 
-We recommend
-[setting up](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
-a virtual enviroment
+Under `/scripts` [set up](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) a virtual enviroment , i use `venv` then:
+
+```python3
+python3 -m venv .venv
+```
+
+Activate the virtual environment for the current
+shell (the selection between the various `activate.something` will depend on your shell) <br>
+I use [fish](https://fishshell.com/) so:
+
+```python3
+source .venv/bin/activate.fish
+```
 
 #### 2. Install requirements
 
 ```python3
-pip3 install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
-## Usage
+#### 3. Download repository
 
-#### 1. Download repository
-
-You can manually download java projects or you can use `repo_downloader.py` by
-creating a file `.txt` containing the list of repo url
+Now you can easily download java projects by using `repo_downloader.py` and passing to it
+a `.txt` file containing the list of repo url you wish to get
 
 ```txt
 https://github.com/google/guice
@@ -28,22 +36,25 @@ https://github.com/jenkinsci/jenkins
 ...
 ```
 
-and launch it by using
+you can launch it by using
 
 ```python3
 python3 repo_downloader.py repo_list.txt
 ```
 
-This will download all the repository into your local project
+This will download all repositories to the project root under the `/repos` folder
+### Project Analyzer setup 🗾 
+Whether you have downloaded some projects using the script shown above, or whether you already have one or more projects to analyze, you can use docker to quickly configure the application
 
-#### 2. Isolate all methods
-
-In order to improve code readability you have to isolate methods from their
-classes. <br> You can do that by using `rsm_input_generator.py` <br>
-
-```python3
-python3 rsm_input_generator.py guice/**/*.java
+in the root of the project launch
+```shell
+docker build -t clarity .
 ```
+If everything went correctly you can move on to the next section
 
-This will create a folder named as the project under `./temp` containing a file
-for all method of all classes
+
+## Usage 🪄
+From the project root simply start the application by passing to it the ___absolute___ path of the projects you wish to analyze as volumes 
+```shell
+docker run -it -v $(realpath repos/guice/):/app/input/guice -v $(realpath repos/guava/):/app/input/guava clarity:latest
+```
