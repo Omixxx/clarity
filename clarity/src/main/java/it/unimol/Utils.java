@@ -13,7 +13,6 @@ import java.util.Optional;
  * Utils
  */
 public class Utils {
- public static String TRAIL_CHARACHTER = System.getProperty("os.name") == "Windows" ? "\\" : "/"; 
 
   public static List<File> getAllJavaFiles(File root) {
     List<File> java_files = new ArrayList<>();
@@ -38,14 +37,6 @@ public class Utils {
     return Optional.ofNullable(filename)
         .filter(f -> f.contains("."))
         .map(f -> f.substring(filename.lastIndexOf(".") + 1));
-  }
-
-  public static String removeExtension(String filename) {
-    return filename.replaceFirst("[.][^.]+$", "");
-  }
-
-  public static boolean isWindows() {
-    return System.getProperty("os.name").toLowerCase().contains("windows");
   }
 
   public static void createFile(File file, String content) throws IOException {

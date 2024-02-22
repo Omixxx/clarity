@@ -4,9 +4,7 @@ package it.unimol;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,8 +13,8 @@ import java.util.logging.Logger;
 
 public class Main {
 
-  private static final String TEMP_FILE_PATH = "temp" + Utils.TRAIL_CHARACHTER;
-  private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+  private static final String TEMP_FILE_PATH = "temp" + System.getProperty("file.separator");
+  private static final Logger LOGGER = CustomLogger.getInstance().getLogger();
   private static final MethodExtractor methodExtractor = new MethodExtractor();
   private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private static final Rsm rsm = new Rsm();
@@ -27,31 +25,29 @@ public class Main {
       LOGGER.info("Processing file: " + file.getPath());
 
       String projectName = file.getName();
+      int rootIndex = filePath.indexOf(projectName);
+
       List<File> javaFiles = Utils.getAllJavaFiles(file);
 
-      int rootIndex = filePath.indexOf(projectName);
       for (File f : javaFiles) {
-
         List<MethodInfo> methodsInfo = new ArrayList<>();
-
         try {
-          LOGGER.info("Extracting methods from file: " + f.getPath());
+          LOGGER.info("Extracting methods...");
           methodsInfo = methodExtractor.extract(f);
         } catch (IOException e) {
           LOGGER.severe("Error extracting methods from file: " + f.getPath() +
               ": " + e.getMessage());
         }
-        LOGGER.info("Methods extracted successfully");
 
         for (MethodInfo methodInfo : methodsInfo) {
-          LOGGER.info("Storing method body and declaration in a temp file: " +
-              methodInfo.getName());
+          LOGGER.info("Wrapping method in a temporary file...");
+
           File tempFile = new File(TEMP_FILE_PATH +
               methodInfo.getRelativePathOfOriginalFile()
                   .substring(rootIndex)
                   .replace(".java", "")
               +
-              Utils.TRAIL_CHARACHTER,
+              System.getProperty("file.separator") +
               methodInfo.getName() + ".java");
 
           try {
@@ -73,6 +69,7 @@ public class Main {
                 methodInfo.getName() + ": " + e.getMessage());
           }
 
+          LOGGER.info("Analyzing method: " + methodInfo.getName());
           double score = rsm.analyze(Path.of(tempFile.getPath()));
           LOGGER.info("Score: " + score);
         }
