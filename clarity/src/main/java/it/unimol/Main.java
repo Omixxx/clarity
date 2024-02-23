@@ -9,12 +9,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Main {
 
   private static final String TEMP_FILE_PATH = "temp" + System.getProperty("file.separator");
-  private static final Logger LOGGER = CustomLogger.getInstance().getLogger();
+  private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
   private static final MethodExtractor methodExtractor = new MethodExtractor();
   private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private static final Rsm rsm = new Rsm();
@@ -35,12 +36,13 @@ public class Main {
           LOGGER.info("Extracting methods...");
           methodsInfo = methodExtractor.extract(f);
         } catch (IOException e) {
-          LOGGER.severe("Error extracting methods from file: " + f.getPath() +
+          LOGGER.error("Error extracting methods from file: " + f.getPath() +
               ": " + e.getMessage());
         }
 
         for (MethodInfo methodInfo : methodsInfo) {
-          LOGGER.info("Wrapping method in a temporary file...");
+          LOGGER.info("Wrapping method " + methodInfo.getName() +
+              " in a temporary file");
 
           File tempFile = new File(TEMP_FILE_PATH +
               methodInfo.getRelativePathOfOriginalFile()
@@ -54,18 +56,18 @@ public class Main {
             Utils.createFile(tempFile,
                 methodExtractor.wrapAsSnippet(methodInfo));
           } catch (IOException e) {
-            LOGGER.severe("Error during file creation: " +
+            LOGGER.error("Error during file creation: " +
                 tempFile.getAbsolutePath() + ": " + e.getMessage());
           }
 
-          LOGGER.info("Serializing methods additional informaton...");
+          LOGGER.info("Serializing methods additional informaton");
           try {
             String json = gson.toJson(methodInfo);
             Utils.createFile(
                 new File(tempFile.getAbsolutePath().replace(".java", ".json")),
                 json);
           } catch (JsonIOException | IOException e) {
-            LOGGER.severe("Error during serialization of method info: " +
+            LOGGER.error("Error during serialization of method: " +
                 methodInfo.getName() + ": " + e.getMessage());
           }
 
