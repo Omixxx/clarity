@@ -30,9 +30,9 @@ Now you can easily download java projects by using `repo_downloader.py` and pass
 a `.txt` file containing the list of repo url you wish to get
 
 ```txt
-https://github.com/google/guice
-https://github.com/google/guava
-https://github.com/jenkinsci/jenkins
+https://github.com/google/guice,
+https://github.com/google/guava,
+https://github.com/jenkinsci/jenkins,
 ...
 ```
 
