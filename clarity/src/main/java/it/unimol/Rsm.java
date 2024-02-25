@@ -7,13 +7,16 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 
 public class Rsm {
-  private final String RSM_PATH = System.getProperty("user.dir") + "/lib/rsm.jar";
+  private final String FILE_SEPARATOR = System.getProperty("file.separator");
+  private final String RSM_PATH = System.getProperty("user.dir") +
+      FILE_SEPARATOR + "lib" + FILE_SEPARATOR +
+      "rsm.jar";
 
   public double analyze(Path path) {
 
     String directoryPath = path.toAbsolutePath().toString();
     ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", RSM_PATH, directoryPath);
-    processBuilder.directory(new File(System.getProperty("user.dir") + "/lib"));
+    processBuilder.directory(new File(new File(RSM_PATH).getParent()));
     StringBuilder output = new StringBuilder();
 
     try {
@@ -23,8 +26,7 @@ public class Rsm {
       while ((line = is.readLine()) != null) {
         output.append(line);
       }
-      process.waitFor();
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return extractScore(output.toString());
