@@ -1,9 +1,10 @@
-.idea/
-clarity/target/**
-clarity/lib/**
 *.class
 *.jar
 *.txt
+
+.idea/
+clarity/target/**
+clarity/lib/**
 clarity/.classpath
 clarity/.settings/*
 clarity/.project
@@ -11,3 +12,4 @@ clarity/temp/**
 
 repos/*
 scripts/.venv/
+!scripts/requirements.txt
