@@ -22,61 +22,57 @@ public class Miner {
   private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final Rsm rsm = new Rsm();
 
-  public void mine(String[] args) {
-    for (String filePath : args) {
-      File file = new File(filePath);
-      LOGGER.info("Processing file: " + file.getPath());
+  public void mine(File file) {
+    LOGGER.info("Processing file: " + file.getPath());
 
-      String projectName = file.getName();
-      int rootIndex = filePath.indexOf(projectName);
+    String projectName = file.getName();
+    int rootIndex = file.getPath().indexOf(projectName);
 
-      List<File> javaFiles = Utils.getAllJavaFiles(file);
+    List<File> javaFiles = Utils.getAllJavaFiles(file);
 
-      for (File f : javaFiles) {
-        List<MethodInfo> methodsInfo = new ArrayList<>();
+    for (File f : javaFiles) {
+      List<MethodInfo> methodsInfo = new ArrayList<>();
+      try {
+        LOGGER.info("Extracting methods...");
+        methodsInfo = methodExtractor.extract(f);
+      } catch (IOException e) {
+        LOGGER.error("Error extracting methods from file: " + f.getPath() +
+            ": " + e.getMessage());
+      }
+
+      for (MethodInfo methodInfo : methodsInfo) {
+        LOGGER.info("Wrapping method " + methodInfo.getName() +
+            " in a temporary file");
+
+        File tempFile = new File(TEMP_FILE_PATH +
+            methodInfo.getRelativePathOfOriginalFile()
+                .substring(rootIndex)
+                .replace(".java", "")
+            +
+            System.getProperty("file.separator") +
+            methodInfo.getName() + ".java");
+
         try {
-          LOGGER.info("Extracting methods...");
-          methodsInfo = methodExtractor.extract(f);
+          Utils.createFile(tempFile, methodExtractor.wrapAsSnippet(methodInfo));
         } catch (IOException e) {
-          LOGGER.error("Error extracting methods from file: " + f.getPath() +
-              ": " + e.getMessage());
+          LOGGER.error("Error during file creation: " +
+              tempFile.getAbsolutePath() + ": " + e.getMessage());
         }
 
-        for (MethodInfo methodInfo : methodsInfo) {
-          LOGGER.info("Wrapping method " + methodInfo.getName() +
-              " in a temporary file");
-
-          File tempFile = new File(TEMP_FILE_PATH +
-              methodInfo.getRelativePathOfOriginalFile()
-                  .substring(rootIndex)
-                  .replace(".java", "")
-              +
-              System.getProperty("file.separator") +
-              methodInfo.getName() + ".java");
-
-          try {
-            Utils.createFile(tempFile,
-                methodExtractor.wrapAsSnippet(methodInfo));
-          } catch (IOException e) {
-            LOGGER.error("Error during file creation: " +
-                tempFile.getAbsolutePath() + ": " + e.getMessage());
-          }
-
-          LOGGER.info("Serializing methods additional informaton");
-          try {
-            String json = gson.toJson(methodInfo);
-            Utils.createFile(
-                new File(tempFile.getAbsolutePath().replace(".java", ".json")),
-                json);
-          } catch (JsonIOException | IOException e) {
-            LOGGER.error("Error during serialization of method: " +
-                methodInfo.getName() + ": " + e.getMessage());
-          }
-
-          LOGGER.info("Analyzing method: " + methodInfo.getName());
-          double score = rsm.analyze(Path.of(tempFile.getPath()));
-          LOGGER.info("Score: " + score);
+        LOGGER.info("Serializing methods additional informaton");
+        try {
+          String json = gson.toJson(methodInfo);
+          Utils.createFile(
+              new File(tempFile.getAbsolutePath().replace(".java", ".json")),
+              json);
+        } catch (JsonIOException | IOException e) {
+          LOGGER.error("Error during serialization of method: " +
+              methodInfo.getName() + ": " + e.getMessage());
         }
+
+        LOGGER.info("Analyzing method: " + methodInfo.getName());
+        double score = rsm.analyze(Path.of(tempFile.getPath()));
+        LOGGER.info("Score: " + score);
       }
     }
   }
