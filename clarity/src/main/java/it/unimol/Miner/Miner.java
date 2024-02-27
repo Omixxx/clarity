@@ -16,13 +16,13 @@ import org.slf4j.LoggerFactory;
  */
 public class Miner {
 
-  private static final String TEMP_FILE_PATH = "temp" + System.getProperty("file.separator");
-  private static final Logger LOGGER = LoggerFactory.getLogger(Miner.class);
-  private static final MethodExtractor methodExtractor = new MethodExtractor();
-  private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-  private static final Rsm rsm = new Rsm();
+  private final String TEMP_FILE_PATH = "temp" + System.getProperty("file.separator");
+  private final Logger LOGGER = LoggerFactory.getLogger(Miner.class);
+  private final MethodExtractor methodExtractor = new MethodExtractor();
+  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  private final Rsm rsm = new Rsm();
 
-  public static void mine(String[] args) {
+  public void mine(String[] args) {
     for (String filePath : args) {
       File file = new File(filePath);
       LOGGER.info("Processing file: " + file.getPath());

@@ -1,4 +1,4 @@
-package it.unimol;
+package it.unimol.Miner;
 
 import java.io.BufferedWriter;
 import java.io.File;
