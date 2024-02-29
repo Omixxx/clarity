@@ -23,6 +23,12 @@ public class Miner {
   private final Rsm rsm = new Rsm();
 
   public void mine(File file) {
+    if (file == null) {
+      System.out.println("File cannot be null");
+      return;
+    }
+
+    
     LOGGER.info("Processing file: " + file.getPath());
 
     String projectName = file.getName();
@@ -31,6 +37,7 @@ public class Miner {
     List<File> javaFiles = Utils.getAllJavaFiles(file);
 
     for (File f : javaFiles) {
+
       List<MethodInfo> methodsInfo = new ArrayList<>();
       try {
         LOGGER.info("Extracting methods...");
@@ -51,6 +58,11 @@ public class Miner {
             +
             System.getProperty("file.separator") +
             methodInfo.getName() + ".java");
+
+        if (tempFile.exists()) {
+          LOGGER.info("file " + tempFile.getName() + " already exists");
+          continue;
+        }
 
         try {
           Utils.createFile(tempFile, methodExtractor.wrapAsSnippet(methodInfo));

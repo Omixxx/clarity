@@ -3,22 +3,24 @@ package it.unimol;
 
 import it.unimol.Miner.Miner;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Main {
-  private static final Miner miner = new Miner();
-  private static final ConcurrentLinkedQueue<File> queue = new ConcurrentLinkedQueue<>();
   private static final int MAX_THREADS = 2;
+  private static final Logger LOGGER = LoggerFactory.getLogger(Miner.class);
 
   public static void main(String[] args) {
+    ConcurrentLinkedQueue<File> queue = new ConcurrentLinkedQueue<>();
     populateQueue(queue, args);
-    startScheduledMining(queue, MAX_THREADS);
+    startScheduledAsyncMining(queue, MAX_THREADS);
   }
 
   private static void populateQueue(Queue<File> queue, String[] args) {
@@ -31,41 +33,35 @@ public class Main {
     }
   }
 
-  private static void startScheduledMining(Queue<File> queue, int maxThreads) {
+  private static void startScheduledAsyncMining(Queue<File> queue,
+      int maxThreads) {
     ExecutorService executorService = Executors.newFixedThreadPool(maxThreads);
-
-    List<CompletableFuture<Void>> futures = new ArrayList<CompletableFuture<Void>>();
+    List<CompletableFuture<Void>> futures = new CopyOnWriteArrayList<>();
 
     while (!queue.isEmpty()) {
       if (futures.size() >= maxThreads) {
         continue;
       }
 
-      System.out.println(futures.size() + " " + maxThreads);
-      System.out.println("Filling...");
-
-      CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(
-          () -> {
-            miner.mine(queue.poll());
-          }, executorService);
+      CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+        LOGGER.info("Start async mining");
+        Miner miner = new Miner();
+        miner.mine(queue.poll());
+      }, executorService);
 
       completableFuture.whenComplete((result, throwable) -> {
         if (throwable == null) {
-          System.out.println("Mining completed, removing from list.");
-          futures.remove(completableFuture);
+          LOGGER.info("Mine completed, cleaning future list");
+          futures.removeIf(cf -> cf.isDone() || cf.isCompletedExceptionally());
         }
-        System.out.println("Error: " + throwable.getMessage());
+        LOGGER.error("Error: " + throwable.getMessage());
       });
-
       futures.add(completableFuture);
-      futures.forEach(cf -> {
-        System.out.println(cf);
-      });
     }
-
+    LOGGER.info(
+        "No more projects to mine, waiting for all futures to complete.");
     CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     allOf.join();
-
     executorService.shutdown();
   }
 }
