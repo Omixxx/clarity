@@ -18,4 +18,4 @@ COPY clarity/lib /app/lib
 COPY --from=build /app/target/clarity-1.0-SNAPSHOT-jar-with-dependencies.jar .
 VOLUME /app/input
 
-ENTRYPOINT ["java", "-jar", "clarity-1.0-SNAPSHOT-jar-with-dependencies.jar", "/app/input" ]
+ENTRYPOINT ["sh", "-c", "java -jar clarity-1.0-SNAPSHOT-jar-with-dependencies.jar /app/input && while true; do sleep 3600; done"]
