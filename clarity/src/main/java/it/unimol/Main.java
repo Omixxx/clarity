@@ -1,81 +1,67 @@
 /* (C)2024 */
 package it.unimol;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
+import it.unimol.Miner.Miner;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Main {
-
-  private static final String TEMP_FILE_PATH = "temp" + System.getProperty("file.separator");
-  private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-  private static final MethodExtractor methodExtractor = new MethodExtractor();
-  private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-  private static final Rsm rsm = new Rsm();
+  private static final int MAX_THREADS = 2;
+  private static final Logger LOGGER = LoggerFactory.getLogger(Miner.class);
 
   public static void main(String[] args) {
-    for (String filePath : args) {
-      File file = new File(filePath);
-      LOGGER.info("Processing file: " + file.getPath());
+    ConcurrentLinkedQueue<File> queue = new ConcurrentLinkedQueue<>();
+    populateQueue(queue, args);
+    startScheduledAsyncMining(queue, MAX_THREADS);
+  }
 
-      String projectName = file.getName();
-      int rootIndex = filePath.indexOf(projectName);
-
-      List<File> javaFiles = Utils.getAllJavaFiles(file);
-
-      for (File f : javaFiles) {
-        List<MethodInfo> methodsInfo = new ArrayList<>();
-        try {
-          LOGGER.info("Extracting methods...");
-          methodsInfo = methodExtractor.extract(f);
-        } catch (IOException e) {
-          LOGGER.error("Error extracting methods from file: " + f.getPath() +
-              ": " + e.getMessage());
-        }
-
-        for (MethodInfo methodInfo : methodsInfo) {
-          LOGGER.info("Wrapping method " + methodInfo.getName() +
-              " in a temporary file");
-
-          File tempFile = new File(TEMP_FILE_PATH +
-              methodInfo.getRelativePathOfOriginalFile()
-                  .substring(rootIndex)
-                  .replace(".java", "")
-              +
-              System.getProperty("file.separator") +
-              methodInfo.getName() + ".java");
-
-          try {
-            Utils.createFile(tempFile,
-                methodExtractor.wrapAsSnippet(methodInfo));
-          } catch (IOException e) {
-            LOGGER.error("Error during file creation: " +
-                tempFile.getAbsolutePath() + ": " + e.getMessage());
-          }
-
-          LOGGER.info("Serializing methods additional informaton");
-          try {
-            String json = gson.toJson(methodInfo);
-            Utils.createFile(
-                new File(tempFile.getAbsolutePath().replace(".java", ".json")),
-                json);
-          } catch (JsonIOException | IOException e) {
-            LOGGER.error("Error during serialization of method: " +
-                methodInfo.getName() + ": " + e.getMessage());
-          }
-
-          LOGGER.info("Analyzing method: " + methodInfo.getName());
-          double score = rsm.analyze(Path.of(tempFile.getPath()));
-          LOGGER.info("Score: " + score);
-        }
+  private static void populateQueue(Queue<File> queue, String[] args) {
+    assert args.length == 1 : "Usage: java -jar <jarfile> <path/to/repos>";
+    File projectsDir = new File(args[0]);
+    for (File file : projectsDir.listFiles()) {
+      if (file.isDirectory()) {
+        queue.add(file);
       }
     }
+  }
+
+  private static void startScheduledAsyncMining(Queue<File> queue,
+      int maxThreads) {
+    ExecutorService executorService = Executors.newFixedThreadPool(maxThreads);
+    List<CompletableFuture<Void>> futures = new CopyOnWriteArrayList<>();
+
+    while (!queue.isEmpty()) {
+      if (futures.size() >= maxThreads) {
+        continue;
+      }
+
+      CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+        LOGGER.info("Start async mining");
+        Miner miner = new Miner();
+        miner.mine(queue.poll());
+      }, executorService);
+
+      completableFuture.whenComplete((result, throwable) -> {
+        if (throwable == null) {
+          LOGGER.info("Mine completed, cleaning future list");
+          futures.removeIf(cf -> cf.isDone() || cf.isCompletedExceptionally());
+        }
+        LOGGER.error("Error: " + throwable.getMessage());
+      });
+      futures.add(completableFuture);
+    }
+    LOGGER.info(
+        "No more projects to mine, waiting for all futures to complete.");
+    CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    allOf.join();
+    executorService.shutdown();
   }
 }

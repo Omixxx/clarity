@@ -1,5 +1,5 @@
 /* (C)2024 */
-package it.unimol;
+package it.unimol.Miner;
 
 final class MethodInfo {
 

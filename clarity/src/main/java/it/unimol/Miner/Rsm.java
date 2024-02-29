@@ -1,4 +1,4 @@
-package it.unimol;
+package it.unimol.Miner;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,10 +21,12 @@ public class Rsm {
 
     try {
       Process process = processBuilder.start();
-      BufferedReader is = new BufferedReader(new InputStreamReader(process.getInputStream()));
-      String line;
-      while ((line = is.readLine()) != null) {
-        output.append(line);
+      try (BufferedReader is = new BufferedReader(
+          new InputStreamReader(process.getInputStream()))) {
+        String line;
+        while ((line = is.readLine()) != null) {
+          output.append(line);
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();
