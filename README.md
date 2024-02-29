@@ -43,24 +43,51 @@ python3 repo_downloader.py repo_list.txt
 ```
 
 This will download all repositories to the project root under the `/repos` folder
-### Project Analyzer setup 🗾 
+
+### Project Analyzer setup 🗾
+
 Whether you have downloaded some projects using the script shown above, or whether you already have one or more projects to analyze, you can use docker to quickly configure the application <br>
-before doing so, go to the clarity folder (where the pom.xml file is) and create a folder called `lib` 
-```shell 
+before doing so, go to the clarity folder (where the pom.xml file is) and create a folder called `lib`
+
+```sh
 mkdir lib
 ```
-then download at this [link](https://dibt.unimol.it/report/readability/files/readability.zip) the readability.zip file and extract it into the `lib` folder 
-```shell
+
+then download at this [link](https://dibt.unimol.it/report/readability/files/readability.zip) the readability.zip file and extract it into the `lib` folder
+
+```sh
 unzip readability.zip -d path/to/lib
 ```
 
 Now we can build the immage by running
-```shell
+
+```sh
 docker build -t clarity .
 ```
 
 ## Usage 🪄
-From the project root simply start the application by passing to it the ___absolute___ path of the projects you wish to analyze as volumes 
-```shell
-docker run -it -v $(realpath repos/guice/):/app/input/guice -v $(realpath repos/guava/):/app/input/guava clarity:latest
+
+From the project root, where the dockerfile is located, simply run the following command:
+
+```sh
+docker run -it --name clarity -v $(realpath repos/):/app/input/ clarity:latest
 ```
+
+where `repos` is the folder containing all the projects you want to analyze. <br>
+We use `relapath` to get the absolute path. <br> <br>
+
+When you launch the aforementioned command, your console will show you a series of logs, representing the fact
+that the program is working. When you are shown the message `Work done!` then you can spawn a new shell
+and copy the results from the container to a local folder, let's call it `temp`
+
+```sh
+docker cp clarity:app/temp ./temp
+```
+
+now you can kill and remove the container
+
+```sh
+docker kill clarity && docker rm clarity
+```
+
+
