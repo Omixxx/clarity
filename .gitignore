@@ -9,6 +9,7 @@ clarity/.classpath
 clarity/.settings/*
 clarity/.project
 clarity/temp/**
+temp/**
 
 repos/*
 scripts/.venv/
