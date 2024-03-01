@@ -33,7 +33,7 @@ public class Miner {
     String projectName = file.getName();
     int rootIndex = file.getPath().indexOf(projectName);
 
-    List<File> javaFiles = Utils.getAllJavaFiles(file);
+    List<File> javaFiles = Utils.getAllFilesFromARoot(file, "java");
 
     for (File f : javaFiles) {
 

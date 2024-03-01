@@ -14,23 +14,24 @@ import java.util.Optional;
  */
 public class Utils {
 
-  public static List<File> getAllJavaFiles(File root) {
-    List<File> java_files = new ArrayList<>();
+  public static List<File> getAllFilesFromARoot(File root, String extension) {
+    List<File> files = new ArrayList<>();
     if (root.isDirectory()) {
       List<File> subFiles = Arrays.asList(root.listFiles());
-      subFiles.forEach(f -> {
-        java_files.addAll(getAllJavaFiles(f));
-      });
+      subFiles.forEach(
+          f -> {
+            files.addAll(getAllFilesFromARoot(f, extension));
+          });
     }
 
-    Optional<String> extension = getFileExtension(root.getPath());
-    if (!extension.isPresent() || extension.isEmpty() ||
-        !extension.get().equals("java")) {
-      return java_files;
+    Optional<String> currentFileExtension = getFileExtension(root.getPath());
+    if (!currentFileExtension.isPresent() || currentFileExtension.isEmpty() ||
+        !currentFileExtension.get().equals(
+            extension.strip().replace(".", ""))) {
+      return files;
     }
-
-    java_files.add(root);
-    return java_files;
+    files.add(root);
+    return files;
   }
 
   public static Optional<String> getFileExtension(String filename) {
