@@ -28,8 +28,7 @@ public class Miner {
       return;
     }
 
-    
-    LOGGER.info("Processing file: " + file.getPath());
+    LOGGER.info("Processing project: " + file.getPath());
 
     String projectName = file.getName();
     int rootIndex = file.getPath().indexOf(projectName);
@@ -38,9 +37,11 @@ public class Miner {
 
     for (File f : javaFiles) {
 
+      System.out.println("\n---------------------[" + f.getName() +
+          "]--------------------\n");
       List<MethodInfo> methodsInfo = new ArrayList<>();
       try {
-        LOGGER.info("Extracting methods...");
+        LOGGER.info("Extracting methods ⛏️");
         methodsInfo = methodExtractor.extract(f);
       } catch (IOException e) {
         LOGGER.error("Error extracting methods from file: " + f.getPath() +
@@ -71,6 +72,11 @@ public class Miner {
               tempFile.getAbsolutePath() + ": " + e.getMessage());
         }
 
+        LOGGER.info("Analyzing method: " + methodInfo.getName());
+        double score = rsm.analyze(Path.of(tempFile.getPath()));
+        methodInfo.setReadabilityScore(score);
+        LOGGER.info("Score: " + score);
+
         LOGGER.info("Serializing methods additional informaton");
         try {
           String json = gson.toJson(methodInfo);
@@ -81,10 +87,6 @@ public class Miner {
           LOGGER.error("Error during serialization of method: " +
               methodInfo.getName() + ": " + e.getMessage());
         }
-
-        LOGGER.info("Analyzing method: " + methodInfo.getName());
-        double score = rsm.analyze(Path.of(tempFile.getPath()));
-        LOGGER.info("Score: " + score);
       }
     }
   }

@@ -10,6 +10,7 @@ final class MethodInfo {
   private Integer endLine;
   private String originFileAbsolutePath;
   private String originFileRelativePath;
+  private Double readabilityScore;
 
   public MethodInfo() {
   }
@@ -53,4 +54,13 @@ final class MethodInfo {
   public String getDeclaration() {
     return this.declaration;
   }
+  
+  public Double getReadabilityScore() {
+    return readabilityScore;
+  }
+
+  public void setReadabilityScore(Double readabilityScore) {
+    this.readabilityScore = readabilityScore;
+  }
+
 }
