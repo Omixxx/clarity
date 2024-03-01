@@ -3,11 +3,18 @@ package it.unimol.Miner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,23 +31,24 @@ public class Miner {
 
   public void mine(File file) {
     if (file == null) {
-      System.out.println("File cannot be null");
+      System.out.println("File cannot be null! Nothing to do.");
       return;
     }
 
-    
-    LOGGER.info("Processing file: " + file.getPath());
+    LOGGER.info("Processing project: " + file.getPath());
 
     String projectName = file.getName();
     int rootIndex = file.getPath().indexOf(projectName);
 
-    List<File> javaFiles = Utils.getAllJavaFiles(file);
+    List<File> javaFiles = Utils.getAllFilesFromARoot(file, "java");
 
     for (File f : javaFiles) {
 
+      System.out.println("\n---------------------[" + f.getName() +
+          "]--------------------\n");
       List<MethodInfo> methodsInfo = new ArrayList<>();
       try {
-        LOGGER.info("Extracting methods...");
+        LOGGER.info("Extracting methods ⛏️");
         methodsInfo = methodExtractor.extract(f);
       } catch (IOException e) {
         LOGGER.error("Error extracting methods from file: " + f.getPath() +
@@ -71,6 +79,11 @@ public class Miner {
               tempFile.getAbsolutePath() + ": " + e.getMessage());
         }
 
+        LOGGER.info("Analyzing method: " + methodInfo.getName());
+        double score = rsm.analyze(Path.of(tempFile.getPath()));
+        methodInfo.setReadabilityScore(score);
+        LOGGER.info("Score: " + score);
+
         LOGGER.info("Serializing methods additional informaton");
         try {
           String json = gson.toJson(methodInfo);
@@ -81,11 +94,65 @@ public class Miner {
           LOGGER.error("Error during serialization of method: " +
               methodInfo.getName() + ": " + e.getMessage());
         }
-
-        LOGGER.info("Analyzing method: " + methodInfo.getName());
-        double score = rsm.analyze(Path.of(tempFile.getPath()));
-        LOGGER.info("Score: " + score);
       }
     }
+  }
+
+  public void resultFilter(int percentageOfTheWorst, int percentageOfTheBest) {
+
+    Path projectsResultsPath = Path.of(TEMP_FILE_PATH);
+    for (File file : projectsResultsPath.toFile().listFiles()) {
+
+      assert file != null : "File cannot be null! Nothing to do.";
+
+      HashMap<File, MethodInfo> metrics = new HashMap<>();
+      List<File> files = Utils.getAllFilesFromARoot(file, "json");
+      int numberOfWorstFilesToKeep = files.size() * percentageOfTheWorst / 100;
+      int numberOfBestFilesToKeep = files.size() * percentageOfTheBest / 100;
+      int numberOfMidFilesToKeep = (numberOfBestFilesToKeep + numberOfWorstFilesToKeep) / 2;
+
+      LOGGER.info("Cleaning irrelevant files 🧹");
+      for (File f : files) {
+        try {
+          String content = Files.readString(Path.of(f.getAbsolutePath()));
+          metrics.put(f, gson.fromJson(content, MethodInfo.class));
+        } catch (IOException e) {
+          LOGGER.error("Error reading file: " + f.getAbsolutePath() + ": " +
+              e.getMessage());
+          e.printStackTrace();
+        }
+      }
+
+      List<File> filesToBeDeleted = metrics.entrySet()
+          .stream()
+          .sorted(Map.Entry.<File, MethodInfo>comparingByValue())
+          .map(Map.Entry::getKey)
+          .collect(Collectors.toList());
+
+      deleteNonRelevantFiles(filesToBeDeleted, numberOfWorstFilesToKeep,
+          numberOfBestFilesToKeep, numberOfMidFilesToKeep);
+    }
+  }
+
+  private void deleteNonRelevantFiles(List<File> files,
+      int numberOfWorstFilesToKeep,
+      int numberOfBestFilesToKeep,
+      int numberOfMidFilesToKeep) {
+
+    files.subList(0, numberOfWorstFilesToKeep).clear();
+    files.subList(files.size() - numberOfBestFilesToKeep, files.size()).clear();
+    int mid = files.size() / 2;
+    files.subList(mid - numberOfMidFilesToKeep, mid + numberOfMidFilesToKeep)
+        .clear();
+    files.forEach(f -> {
+      LOGGER.info("Deleting file: " + f.getName());
+      f.delete();
+    });
+
+    LOGGER.info("Cleaning snippet files 🧹");
+    Utils.getAllFilesFromARoot(Path.of(TEMP_FILE_PATH).toFile(), "java")
+        .forEach(f -> {
+          f.delete();
+        });
   }
 }

@@ -49,19 +49,19 @@ This will download all repositories to the project root under the `/repos` folde
 Whether you have downloaded some projects using the script shown above, or whether you already have one or more projects to analyze, you can use docker to quickly configure the application <br>
 before doing so, go to the clarity folder (where the pom.xml file is) and create a folder called `lib`
 
-```sh
+```bash
 mkdir lib
 ```
 
 then download at this [link](https://dibt.unimol.it/report/readability/files/readability.zip) the readability.zip file and extract it into the `lib` folder
 
-```sh
+```bash
 unzip readability.zip -d path/to/lib
 ```
 
 Now we can build the immage by running
 
-```sh
+```bash
 docker build -t clarity .
 ```
 
@@ -69,7 +69,7 @@ docker build -t clarity .
 
 From the project root, where the dockerfile is located, simply run the following command:
 
-```sh
+```bash
 docker run -it --name clarity -v $(realpath repos/):/app/input/ clarity:latest
 ```
 
@@ -78,16 +78,36 @@ We use `relapath` to get the absolute path. <br> <br>
 
 When you launch the aforementioned command, your console will show you a series of logs, representing the fact
 that the program is working. When you are shown the message `Work done!` then you can spawn a new shell
-and copy the results from the container to a local folder, let's call it `temp`
+and copy the results from the container to a local folder, let's call it `output`, to view them better
 
-```sh
-docker cp clarity:app/temp ./temp
+```bash
+docker cp clarity:app/temp ./output
 ```
 
-now you can kill and remove the container
+### Fine tuning ⚙️
 
-```sh
-docker kill clarity && docker rm clarity
+You can configure, through the `clarity/assets/env` file, various options to refine the effectiveness of the application.
+<br> Specifically there are currently three variables: <br>
+
+- `MAX_THREADS` &rarr; i.e. the maximum number of projects that the application will compute at the same time. It goes without saying that the more threads there are, the faster it will go, however it is advisable to have a high-performance machine for a high number of threads. The default value is 3 <br>
+
+- `PERCENTAGE_OF_THE_MOST_READABLE` &rarr; This percentage tells the application how many of the most readable methods to keep (default is 20)
+
+- `PERCENTAGE_OF_THE_WORST_READABLE` &rarr; This percentage tells the application how many of the less readable methods to keep (default is 20)
+
+However, the application will also retain a median component, i.e. a quantity equal to the average between `PERCENTAGE_OF_THE_MOST_READABLE` and `PERCENTAGE_OF_THE_WORST_READABLE`.
+
+The choice between the various files is explained through this illustration of the algorithm:
+
 ```
-
-
+                                      delete    delete
+                                        ^         ^
+                                        |         |
+                                       ---       ---
+                                [a b c d e f g h i l m n o]
+                                 -----     -----     -----
+                                  |          |          |
+                                  |          |          |
+                                  v          v          v
+                                worst       mid        best
+```
