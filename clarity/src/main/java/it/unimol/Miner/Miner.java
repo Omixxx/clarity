@@ -98,8 +98,7 @@ public class Miner {
     }
   }
 
-  public void resultFilter(int percentageOfTheWorst, int percentageOfTheBest,
-      int percentageOfTheMiddle) {
+  public void resultFilter(int percentageOfTheWorst, int percentageOfTheBest) {
 
     Path projectsResultsPath = Path.of(TEMP_FILE_PATH);
     for (File file : projectsResultsPath.toFile().listFiles()) {

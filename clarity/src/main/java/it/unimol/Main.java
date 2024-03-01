@@ -1,6 +1,7 @@
 /* (C)2024 */
 package it.unimol;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import it.unimol.Miner.Miner;
 import java.io.File;
 import java.util.List;
@@ -14,15 +15,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Main {
-  private static final int MAX_THREADS = 2;
   private static final Logger LOGGER = LoggerFactory.getLogger(Miner.class);
 
   public static void main(String[] args) {
+    Dotenv dotenv = Dotenv.configure()
+        .directory("assets")
+        .ignoreIfMalformed()
+        .ignoreIfMissing()
+        .filename("env")
+        .load();
+
+    final int MAX_THREADS = Integer.valueOf(dotenv.get("MAX_THREADS", "3"));
+    final int BEST_PERCENTAGE = Integer.valueOf(dotenv.get("PERCENTAGE_OF_THE_BEST", "20"));
+    final int WORST_PERCENTAGE = Integer.valueOf(dotenv.get("PERCENTAGE_OF_THE_WORST", "20"));
     ConcurrentLinkedQueue<File> queue = new ConcurrentLinkedQueue<>();
+
     populateQueue(queue, args);
     startScheduledAsyncMining(queue, MAX_THREADS);
     Miner miner = new Miner();
-    miner.resultFilter(20, 20, 20);
+    miner.resultFilter(BEST_PERCENTAGE, WORST_PERCENTAGE);
     LOGGER.info("Work done!✨");
   }
 
