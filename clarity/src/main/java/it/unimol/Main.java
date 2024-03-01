@@ -26,8 +26,13 @@ public class Main {
         .load();
 
     final int MAX_THREADS = Integer.valueOf(dotenv.get("MAX_THREADS", "3"));
-    final int BEST_PERCENTAGE = Integer.valueOf(dotenv.get("PERCENTAGE_OF_THE_BEST", "20"));
-    final int WORST_PERCENTAGE = Integer.valueOf(dotenv.get("PERCENTAGE_OF_THE_WORST", "20"));
+    final int BEST_PERCENTAGE = Integer.valueOf(dotenv.get("PERCENTAGE_OF_THE_MOST_READABLE", "20"));
+    final int WORST_PERCENTAGE = Integer.valueOf(dotenv.get("PERCENTAGE_OF_THE_WORST_READABLE", "20"));
+
+    assert MAX_THREADS > 0 : "MAX_THREADS must be greater than 0";
+    assert BEST_PERCENTAGE > 0 : "BEST_PERCENTAGE must be greater than 0";
+    assert WORST_PERCENTAGE > 0 : "WORST_PERCENTAGE must be greater than 0";
+
     ConcurrentLinkedQueue<File> queue = new ConcurrentLinkedQueue<>();
 
     populateQueue(queue, args);

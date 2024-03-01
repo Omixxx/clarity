@@ -84,4 +84,30 @@ and copy the results from the container to a local folder, let's call it `output
 docker cp clarity:app/temp ./output
 ```
 
+### Fine tuning ⚙️
 
+You can configure, through the `clarity/assets/env` file, various options to refine the effectiveness of the application.
+<br> Specifically there are currently three variables: <br>
+
+- `MAX_THREADS` &rarr; i.e. the maximum number of projects that the application will compute at the same time. It goes without saying that the more threads there are, the faster it will go, however it is advisable to have a high-performance machine for a high number of threads. The default value is 3 <br>
+
+- `PERCENTAGE_OF_THE_MOST_READABLE` &rarr; This percentage tells the application how many of the most readable methods to keep (default is 20)
+
+- `PERCENTAGE_OF_THE_WORST_READABLE` &rarr; This percentage tells the application how many of the less readable methods to keep (default is 20)
+
+However, the application will also retain a median component, i.e. a quantity equal to the average between `PERCENTAGE_OF_THE_MOST_READABLE` and `PERCENTAGE_OF_THE_WORST_READABLE`.
+
+The choice between the various files is explained through this illustration of the algorithm:
+
+```
+                                      delete    delete
+                                        ^         ^
+                                        |         |
+                                       ---       ---
+                                [a b c d e f g h i l m n o]
+                                 -----     -----     -----
+                                  |          |          |
+                                  |          |          |
+                                  v          v          v
+                                worst       mid        best
+```
