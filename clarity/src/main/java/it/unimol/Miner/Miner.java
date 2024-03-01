@@ -149,7 +149,7 @@ public class Miner {
       LOGGER.info("Deleting file: " + f.getName());
       f.delete();
     });
-    
+
     LOGGER.info("Cleaning snippet files 🧹");
     Utils.getAllFilesFromARoot(Path.of(TEMP_FILE_PATH).toFile(), "java")
         .forEach(f -> {
