@@ -73,8 +73,7 @@ From the project root, where the dockerfile is located, simply run the following
 docker run -it --name clarity -v $(realpath repos/):/app/input/ clarity:latest
 ```
 
-where `repos` is the folder containing all the projects you want to analyze. <br>
-We use `relapath` to get the absolute path. <br> <br>
+where `repos` is the folder containing all the projects you want to analyze. <br><br>
 
 When you launch the aforementioned command, your console will show you a series of logs, representing the fact
 that the program is working. When you are shown the message `Work done!` then you can spawn a new shell
