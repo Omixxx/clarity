@@ -78,16 +78,10 @@ We use `relapath` to get the absolute path. <br> <br>
 
 When you launch the aforementioned command, your console will show you a series of logs, representing the fact
 that the program is working. When you are shown the message `Work done!` then you can spawn a new shell
-and copy the results from the container to a local folder, let's call it `temp`
+and copy the results from the container to a local folder, let's call it `output`, to view them better
 
 ```bash
-docker cp clarity:app/temp ./temp
-```
-
-now you can kill and remove the container
-
-```bash
-docker kill clarity && docker rm clarity
+docker cp clarity:app/temp ./output
 ```
 
 
