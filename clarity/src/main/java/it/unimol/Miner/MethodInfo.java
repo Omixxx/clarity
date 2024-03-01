@@ -1,7 +1,7 @@
 /* (C)2024 */
 package it.unimol.Miner;
 
-final class MethodInfo {
+final class MethodInfo implements Comparable<MethodInfo> {
 
   private String name;
   private String declaration;
@@ -54,7 +54,7 @@ final class MethodInfo {
   public String getDeclaration() {
     return this.declaration;
   }
-  
+
   public Double getReadabilityScore() {
     return readabilityScore;
   }
@@ -63,4 +63,8 @@ final class MethodInfo {
     this.readabilityScore = readabilityScore;
   }
 
+  @Override
+  public int compareTo(MethodInfo m) {
+    return this.getReadabilityScore().compareTo(m.getReadabilityScore());
+  }
 }

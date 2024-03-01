@@ -21,6 +21,8 @@ public class Main {
     ConcurrentLinkedQueue<File> queue = new ConcurrentLinkedQueue<>();
     populateQueue(queue, args);
     startScheduledAsyncMining(queue, MAX_THREADS);
+    Miner miner = new Miner();
+    miner.resultFilter(20, 20, 20);
     LOGGER.info("Work done!✨");
   }
 
