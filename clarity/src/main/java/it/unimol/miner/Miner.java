@@ -35,7 +35,6 @@ public class Miner {
     LOGGER.info("Processing project: " + file.getPath());
 
     String projectName = file.getName();
-    int rootIndex = file.getPath().indexOf(projectName);
 
     List<File> javaFiles = Utils.getAllFilesFromARoot(file, "java");
 
@@ -46,7 +45,7 @@ public class Miner {
       List<MethodInfo> methodsInfo = new ArrayList<>();
       try {
         LOGGER.info("Extracting methods ⛏️");
-        methodsInfo = methodExtractor.extract(f);
+        methodsInfo = methodExtractor.extract(f, projectName);
       } catch (IOException e) {
         LOGGER.error("Error extracting methods from file: " + f.getPath() +
             ": " + e.getMessage());
@@ -57,8 +56,7 @@ public class Miner {
             " in a temporary file");
 
         File tempFile = new File(TEMP_FILE_PATH +
-            methodInfo.getRelativePathOfOriginalFile()
-                .substring(rootIndex)
+            methodInfo.getClassPath()
                 .replace(".java", "")
             +
             System.getProperty("file.separator") +

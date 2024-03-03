@@ -7,30 +7,23 @@ final class MethodInfo implements Comparable<MethodInfo> {
   private String method;
   private Integer startLine;
   private Integer endLine;
-  private String originFileAbsolutePath;
-  private String originFileRelativePath;
+  private String classPath;
   private Double readabilityScore;
 
   public MethodInfo() {
   }
 
   public MethodInfo(String name, String body, Integer startLine,
-      Integer endLine, String orginFileAbsolutePath,
-      String relativePath, String declaration) {
+      Integer endLine, String declaration, String classPath) {
     this.name = name;
     this.startLine = startLine;
     this.endLine = endLine;
-    this.originFileAbsolutePath = orginFileAbsolutePath;
-    this.originFileRelativePath = relativePath;
+    this.classPath = classPath;
     this.method = mergeBodyAndDeclaration(body, declaration);
   }
 
-  public String getAbsolutePathOfOriginalFile() {
-    return this.originFileAbsolutePath;
-  }
-
-  public String getRelativePathOfOriginalFile() {
-    return this.originFileRelativePath;
+  public String getClassPath() {
+    return classPath;
   }
 
   public Integer getStartLine() {
