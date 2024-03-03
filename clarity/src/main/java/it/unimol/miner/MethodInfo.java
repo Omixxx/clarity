@@ -1,5 +1,5 @@
 /* (C)2024 */
-package it.unimol.Miner;
+package it.unimol.miner;
 
 final class MethodInfo implements Comparable<MethodInfo> {
 

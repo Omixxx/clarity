@@ -2,7 +2,7 @@
 package it.unimol;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import it.unimol.Miner.Miner;
+import it.unimol.miner.Miner;
 import java.io.File;
 import java.util.List;
 import java.util.Queue;

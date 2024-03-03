@@ -1,5 +1,5 @@
 /* (C)2024 */
-package it.unimol.Miner;
+package it.unimol.miner;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
