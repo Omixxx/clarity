@@ -1,5 +1,8 @@
 package it.unimol.miner;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,13 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
 
 /**
  * Miner
@@ -72,7 +70,8 @@ public class Miner {
         }
 
         try {
-          Utils.createFile(tempFile, methodExtractor.wrapAsSnippet(methodInfo));
+          Utils.createFile(tempFile, "class Snippet {\n" +
+              methodInfo.getMethod() + "\n}");
         } catch (IOException e) {
           LOGGER.error("Error during file creation: " +
               tempFile.getAbsolutePath() + ": " + e.getMessage());
