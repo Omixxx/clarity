@@ -22,6 +22,12 @@ public class MethodExtractor {
 
       CompilationUnit cu = StaticJavaParser.parse(s);
       for (MethodDeclaration method : cu.findAll(MethodDeclaration.class)) {
+
+        if (method.isConstructorDeclaration() ||
+            isMethodAGetterOrSetter(method)) {
+          continue;
+        }
+
         String classPath = file.getPath().substring(file.getPath().indexOf(projectName));
         this.methods.add(new MethodInfo(
             method.getNameAsString(),
@@ -35,5 +41,12 @@ public class MethodExtractor {
       throw new IOException("Error while reading the file");
     }
     return this.methods;
+  }
+
+  // We assume that the code is correctly formatted in order to applay
+  // thi heuristic
+  private boolean isMethodAGetterOrSetter(MethodDeclaration method) {
+    return method.getRange().get().end.line -
+        method.getRange().get().begin.line < 3;
   }
 }
