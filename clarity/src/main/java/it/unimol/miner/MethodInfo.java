@@ -4,39 +4,26 @@ package it.unimol.miner;
 final class MethodInfo implements Comparable<MethodInfo> {
 
   private String name;
-  private String declaration;
-  private String body;
+  private String method;
   private Integer startLine;
   private Integer endLine;
-  private String originFileAbsolutePath;
-  private String originFileRelativePath;
+  private String classPath;
   private Double readabilityScore;
 
   public MethodInfo() {
   }
 
   public MethodInfo(String name, String body, Integer startLine,
-      Integer endLine, String orginFileAbsolutePath,
-      String relativePath, String declaration) {
+      Integer endLine, String declaration, String classPath) {
     this.name = name;
-    this.declaration = declaration;
-    this.body = body;
     this.startLine = startLine;
     this.endLine = endLine;
-    this.originFileAbsolutePath = orginFileAbsolutePath;
-    this.originFileRelativePath = relativePath;
+    this.classPath = classPath;
+    this.method = mergeBodyAndDeclaration(body, declaration);
   }
 
-  public String getAbsolutePathOfOriginalFile() {
-    return this.originFileAbsolutePath;
-  }
-
-  public String getRelativePathOfOriginalFile() {
-    return this.originFileRelativePath;
-  }
-
-  public String getBody() {
-    return body;
+  public String getClassPath() {
+    return classPath;
   }
 
   public Integer getStartLine() {
@@ -51,8 +38,8 @@ final class MethodInfo implements Comparable<MethodInfo> {
     return this.name;
   }
 
-  public String getDeclaration() {
-    return this.declaration;
+  public String getMethod() {
+    return this.method;
   }
 
   public Double getReadabilityScore() {
@@ -66,5 +53,18 @@ final class MethodInfo implements Comparable<MethodInfo> {
   @Override
   public int compareTo(MethodInfo m) {
     return this.getReadabilityScore().compareTo(m.getReadabilityScore());
+  }
+
+  private String mergeBodyAndDeclaration(String body, String declaration) {
+    String nonFormattedMethod = declaration + body;
+    assert (!nonFormattedMethod.isEmpty() && nonFormattedMethod.contains("\n"));
+
+    String spaces = nonFormattedMethod.split("\n")[0].replaceAll("[^ ]", "");
+    StringBuilder method = new StringBuilder("");
+    for (String str : nonFormattedMethod.split("\n")) {
+      method.append(spaces + str + "\n");
+    }
+    method.deleteCharAt(method.length() - 1);
+    return method.toString();
   }
 }

@@ -1,5 +1,8 @@
 package it.unimol.miner;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,13 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
 
 /**
  * Miner
@@ -37,7 +35,6 @@ public class Miner {
     LOGGER.info("Processing project: " + file.getPath());
 
     String projectName = file.getName();
-    int rootIndex = file.getPath().indexOf(projectName);
 
     List<File> javaFiles = Utils.getAllFilesFromARoot(file, "java");
 
@@ -48,7 +45,7 @@ public class Miner {
       List<MethodInfo> methodsInfo = new ArrayList<>();
       try {
         LOGGER.info("Extracting methods ⛏️");
-        methodsInfo = methodExtractor.extract(f);
+        methodsInfo = methodExtractor.extract(f, projectName);
       } catch (IOException e) {
         LOGGER.error("Error extracting methods from file: " + f.getPath() +
             ": " + e.getMessage());
@@ -59,8 +56,7 @@ public class Miner {
             " in a temporary file");
 
         File tempFile = new File(TEMP_FILE_PATH +
-            methodInfo.getRelativePathOfOriginalFile()
-                .substring(rootIndex)
+            methodInfo.getClassPath()
                 .replace(".java", "")
             +
             System.getProperty("file.separator") +
@@ -72,7 +68,8 @@ public class Miner {
         }
 
         try {
-          Utils.createFile(tempFile, methodExtractor.wrapAsSnippet(methodInfo));
+          Utils.createFile(tempFile, "class Snippet {\n" +
+              methodInfo.getMethod() + "\n}");
         } catch (IOException e) {
           LOGGER.error("Error during file creation: " +
               tempFile.getAbsolutePath() + ": " + e.getMessage());
