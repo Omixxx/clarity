@@ -9,6 +9,7 @@ final class MethodInfo implements Comparable<MethodInfo> {
   private Integer endLine;
   private String classPath;
   private Double readabilityScore;
+  private ReadabilityLabel label;
 
   public MethodInfo() {
   }
@@ -20,6 +21,15 @@ final class MethodInfo implements Comparable<MethodInfo> {
     this.endLine = endLine;
     this.classPath = classPath;
     this.method = mergeBodyAndDeclaration(body, declaration);
+    this.label = ReadabilityLabel.NONE;
+  }
+
+  public void setReadabilityLabel(ReadabilityLabel label) {
+    this.label = label;
+  }
+
+  public ReadabilityLabel getReadabilityLabel() {
+    return this.label;
   }
 
   public String getClassPath() {
