@@ -38,7 +38,7 @@ public class Main {
     populateQueue(queue, args);
     startScheduledAsyncMining(queue, MAX_THREADS);
     Miner miner = new Miner();
-    miner.resultFilter(BEST_PERCENTAGE, WORST_PERCENTAGE);
+    miner.filterResults(BEST_PERCENTAGE, WORST_PERCENTAGE);
     LOGGER.info("Work done!✨");
   }
 
