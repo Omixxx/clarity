@@ -54,6 +54,6 @@ public class MethodExtractor {
   // this heuristic
   private boolean isMethodAGetterOrSetter(MethodDeclaration method) {
     return (method.getRange().get().end.line -
-        method.getRange().get().begin.line) < 3;
+        method.getRange().get().begin.line) <= 3;
   }
 }
