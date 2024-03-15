@@ -75,10 +75,9 @@ final class MethodInfo implements Comparable<MethodInfo> {
     String nonFormattedMethod = annotationsString + declaration + body;
     assert (!nonFormattedMethod.isEmpty() && nonFormattedMethod.contains("\n"));
 
-    String spaces = nonFormattedMethod.split("\n")[0].replaceAll("[^ ]", "");
     StringBuilder method = new StringBuilder("");
     for (String str : nonFormattedMethod.split("\n")) {
-      method.append(spaces + str + "\n");
+      method.append("\t\t" + str + "\n");
     }
     method.deleteCharAt(method.length() - 1);
     return method.toString();
