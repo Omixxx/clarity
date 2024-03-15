@@ -1,6 +1,8 @@
 /* (C)2024 */
 package it.unimol.miner;
 
+import java.util.List;
+
 final class MethodInfo implements Comparable<MethodInfo> {
 
   private String name;
@@ -14,13 +16,14 @@ final class MethodInfo implements Comparable<MethodInfo> {
   public MethodInfo() {
   }
 
-  public MethodInfo(String name, String body, Integer startLine,
-      Integer endLine, String declaration, String classPath) {
+  public MethodInfo(String name, String body, List<String> annotations,
+      Integer startLine, Integer endLine, String declaration,
+      String classPath) {
     this.name = name;
     this.startLine = startLine;
     this.endLine = endLine;
     this.classPath = classPath;
-    this.method = mergeBodyAndDeclaration(body, declaration);
+    this.method = mergeAnnotationsBodyAndDeclaration(body, declaration, annotations);
     this.label = ReadabilityLabel.NONE;
   }
 
@@ -65,8 +68,11 @@ final class MethodInfo implements Comparable<MethodInfo> {
     return this.getReadabilityScore().compareTo(m.getReadabilityScore());
   }
 
-  private String mergeBodyAndDeclaration(String body, String declaration) {
-    String nonFormattedMethod = declaration + body;
+  private String mergeAnnotationsBodyAndDeclaration(String body,
+      String declaration,
+      List<String> annotations) {
+    String annotationsString = annotations.stream().reduce("", (a, b) -> a + b + "\n");
+    String nonFormattedMethod = annotationsString + declaration + body;
     assert (!nonFormattedMethod.isEmpty() && nonFormattedMethod.contains("\n"));
 
     String spaces = nonFormattedMethod.split("\n")[0].replaceAll("[^ ]", "");
