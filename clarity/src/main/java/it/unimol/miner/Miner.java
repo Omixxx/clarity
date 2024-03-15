@@ -38,7 +38,8 @@ public class Miner {
 
     String projectName = file.getName();
 
-    List<File> javaFiles = Utils.getAllFilesFromARoot(file, "java");
+    List<String> excludedSymbols = List.of("test", "Test", "Tests", "tests", "testing", "Testing");
+    List<File> javaFiles = Utils.getAllFilesFromARoot(file, "java", excludedSymbols);
 
     for (File f : javaFiles) {
 
@@ -102,7 +103,7 @@ public class Miner {
       assert file != null : "File cannot be null! Nothing to do.";
 
       HashMap<File, MethodInfo> metrics = new HashMap<>();
-      List<File> files = Utils.getAllFilesFromARoot(file, "json");
+      List<File> files = Utils.getAllFilesFromARoot(file, "json", new ArrayList<>());
       int numberOfWorstFilesToKeep = files.size() * percentageOfTheWorst / 100;
       int numberOfBestFilesToKeep = files.size() * percentageOfTheBest / 100;
       int numberOfMidFilesToKeep = (numberOfBestFilesToKeep + numberOfWorstFilesToKeep) / 2;
@@ -179,7 +180,9 @@ public class Miner {
     });
 
     LOGGER.info("Cleaning snippet files 🧹");
-    Utils.getAllFilesFromARoot(Path.of(TEMP_FILE_PATH).toFile(), "java")
+    Utils
+        .getAllFilesFromARoot(Path.of(TEMP_FILE_PATH).toFile(), "java",
+            new ArrayList<>())
         .forEach(f -> {
           f.delete();
         });

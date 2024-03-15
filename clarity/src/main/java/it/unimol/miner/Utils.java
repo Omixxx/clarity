@@ -14,14 +14,22 @@ import java.util.Optional;
  */
 public class Utils {
 
-  public static List<File> getAllFilesFromARoot(File root, String extension) {
+  public static List<File> getAllFilesFromARoot(File root, String extension,
+      List<String> excludedFoldersWithSymbols) {
+
     List<File> files = new ArrayList<>();
     if (root.isDirectory()) {
+
+      if (excludedFoldersWithSymbols.stream().anyMatch(
+          root.getName()::contains)) {
+        return files;
+      }
+
       List<File> subFiles = Arrays.asList(root.listFiles());
-      subFiles.forEach(
-          f -> {
-            files.addAll(getAllFilesFromARoot(f, extension));
-          });
+      subFiles.forEach(f -> {
+        files.addAll(
+            getAllFilesFromARoot(f, extension, excludedFoldersWithSymbols));
+      });
     }
 
     Optional<String> currentFileExtension = getFileExtension(root.getPath());

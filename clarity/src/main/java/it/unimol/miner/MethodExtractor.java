@@ -43,10 +43,10 @@ public class MethodExtractor {
     return this.methods;
   }
 
-  // We assume that the code is correctly formatted in order to applay
-  // thi heuristic
+  // We assume that the code is correctly formatted in order to apply
+  // this heuristic
   private boolean isMethodAGetterOrSetter(MethodDeclaration method) {
-    return method.getRange().get().end.line -
-        method.getRange().get().begin.line < 3;
+    return (method.getRange().get().end.line -
+        method.getRange().get().begin.line) <= 3;
   }
 }
